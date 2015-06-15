@@ -207,14 +207,14 @@ class Tree:
 	
 		else:
 			#we split the node, and call build branches on it again. 	
-			new_pos_data_list = trimDataList(attribute, True, data_list)	
+			new_pos_data_list = trimDataList(currentNode.attribute, True, data_list)	
 			attribute1 = gainiestAttribute(new_pos_data_list)
 			newNode1 = Node(attribute1)		
 			currentNode.addChild(newNode1)
 			buildBranches(new_pos_data_list, newNode1)
 			
 	
-			new_neg_data_list = trimDataList(attribute, False, data_list)
+			new_neg_data_list = trimDataList(currentNode.attribute, False, data_list)
 			attribute0 = gainiestAttribute(new_neg_data_list)	
 			newNode0 = Node(attribute0)
 			currentNode.addChild(newNode0)
