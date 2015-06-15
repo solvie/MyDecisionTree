@@ -1,0 +1,13 @@
+1. Should take datapoints as a set of labels and the data as an n dimensional array. 
+
+2. have a method that takes all of the features, and calculates the information gain of each;
+ and uses that as a basis to split the node. do this recursively, so that eventually when there are no more attributes left, you create a leaf? basically creates a tree based on data.
+
+3. Use that to instantiate the decision tree.
+
+4. have methods that
+	- calculates the entropy
+	- calculates the information gain (remember that there needs to be more sophisticated methods for things that aren't binary; for now, do pick only binary values, big/small, 1/0;
+	- uses the decision tree to predict the classificiation of a new data point
+	- takes as input a bunch of data points and constructs a new tree based on the new information.
+	
