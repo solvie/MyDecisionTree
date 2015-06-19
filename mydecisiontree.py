@@ -24,24 +24,25 @@ class Datapoint:
 
 	"""
 	def __init__(self, values):
-		self.holeInJeansAuthentic = values[0]
-		self.dreadlocks = values[1]
-		self.coffeeCupEmpty = values[2]
-		self.smartPhone = values[3]
-		self.hoboOrHippie = values[4]
+		self.holeInJeansAuthentic = int(values[0])
+		self.dreadlocks = int(values[1])
+		self.coffeeCupEmpty = int(values[2])
+		self.smartPhone = int(values[3])
+		self.hoboOrHippie = int(values[4])
+		self.asvalues = values
 	
 	def read(self):
-		print self.holeInJeansAuthentic, self.dreadlocks, self.coffeeCupEmpty, self.smartPhone, self.hoboOrHippie
+		print "[", str(self.holeInJeansAuthentic), str(self.dreadlocks), str(self.coffeeCupEmpty), str(self.smartPhone), str(self.hoboOrHippie), "]"
 	
-	def getAttribute(self, i):
+	def getAttributeValue(self, i):
 		if i ==1:
-			return int(self.holeInJeansAuthentic)
+			return self.holeInJeansAuthentic
 		elif i ==2:
-			return int(self.dreadlocks)
+			return self.dreadlocks
 		elif i ==3:
-			return int(self.coffeeCupEmpty)
+			return self.coffeeCupEmpty
 		elif i ==4:
-			return int(self.smartPhone)
+			return self.smartPhone
 		else: 
 			return None	
 			print "invalid attribute number"
@@ -49,16 +50,19 @@ class Datapoint:
 #TODO
 class Node:
 	"""
-	The tree is built up of nodes. If the attribute_no is -1, that means it is a leaf. 
-
+	The tree is built up of nodes. If the attribute_no is 0, that means it is a leaf. 
+	
+	Attribute key: 1=holeInJeansAuthentic, 2=dreadlocks, 3=coffeeCupEmpty, 4=smartPhone
+ 
 	"""
 
-	def __init__(self, attribute_no = -1):
+	def __init__(self, attribute_no = 0):
 		self.children = []
 		self.numAncestors = 0
 		self.attribute = attribute_no	 #integer code
 		self.parent = None
 		self.leaf = None
+		self.stem = None
 
 	def addChild(self, node):
 		self.children.append(node)
@@ -71,12 +75,12 @@ class Node:
 		self.numAncestors = 0
 		ancestor = self.parent
 		while  ancestor != None:
-			self.numAncestors = self.numAncestors+1
+			self.numAncestors = self.numAncestors +1
 			ancestor = ancestor.parent
 		return self.numAncestors
 	
-	def setLeaf(self, value):
-		self.leaf = value
+	def toString(self):
+		print "[ Attribute "+ str(self.attribute) + " ]"		
 
 	# A node should have a parent and a list of children. 
 
@@ -109,9 +113,9 @@ def getS(datapoint_list, optional_attribute=0):
 			else: print "something wrong with this value yo"
 	else:
 		for point in datapoint_list:
-			if int(point.hoboOrHippie) ==1 and int(point.getAttribute(optional_attribute))==1:
+			if int(point.hoboOrHippie) ==1 and int(point.getAttributeValue(optional_attribute))==1:
 				plus = plus +1
-			elif int(point.hoboOrHippie)==0 and int(point.getAttribute(optional_attribute))==1:
+			elif int(point.hoboOrHippie)==0 and int(point.getAttributeValue(optional_attribute))==1:
 				minus = minus + 1
 
 	sValue.append(plus)
@@ -133,18 +137,22 @@ def calculateGain(datapoint_list, attribute):
 	totalS = getS(datapoint_list)
 	totalEntropy = calculateEntropy(totalS[0], totalS[1])
 	
-	denomin = totalS[0]+totalS[1]
-	
-	sAttribute = getS(datapoint_list, attribute)
-	subEntropyPos = calculateEntropy(sAttribute[0], sAttribute[1])
-	nomin1 = sAttribute[0]+sAttribute[1]
- 
-	subEntropyNeg = calculateEntropy(totalS[0]-sAttribute[0], totalS[1]-sAttribute[1])
-	nomin2 = denomin - nomin1
+	if totalEntropy ==0:
+		return 0
 
-	gain = totalEntropy - (float(nomin1)/denomin)*subEntropyPos - (float(nomin2)/denomin)*subEntropyNeg
+	else:
+		denomin = totalS[0]+totalS[1]
 	
-	return gain
+		sAttribute = getS(datapoint_list, attribute)
+		subEntropyPos = calculateEntropy(sAttribute[0], sAttribute[1])
+		nomin1 = sAttribute[0]+sAttribute[1]
+	 
+		subEntropyNeg = calculateEntropy(totalS[0]-sAttribute[0], totalS[1]-sAttribute[1])
+		nomin2 = denomin - nomin1
+
+		gain = totalEntropy - (float(nomin1)/denomin)*subEntropyPos - (float(nomin2)/denomin)*subEntropyNeg
+	
+		return gain
 
 def gainiestAttribute(data_list):
 	list_of_gains = []
@@ -154,15 +162,34 @@ def gainiestAttribute(data_list):
 		list_of_gains.append(gain)
 		i = i+1
 	
-	attributeIndex = list_of_gains.index(max(list_of_gains))
-	return attributeIndex
+	if max(list_of_gains) == 0:
+		return 0
+	else:
+		attributeIndex = list_of_gains.index(max(list_of_gains))
+		return attributeIndex
 
 def trimDataList(attribute, on_off, data_list): #on =1 off =0
-	for datapoint in data_list:
-		if datapoint.getAttribute(attribute) != on_off:
-			data_list.remove(datapoint)
-	return data_list
-	
+	if attribute ==0:
+		return data_list
+	else:
+		newdatalist =[]
+		for datapoint in data_list:
+			if datapoint.getAttributeValue(attribute) == on_off:
+				newdatalist.append(datapoint)
+		return newdatalist
+
+def moreHobosOrHippies(data_list):
+	hobo = 0
+	hippie = 0
+	for point in data_list:
+		if point.hoboOrHippie ==1:
+			hobo = hobo + 1
+		else:
+			hippie = hippie +1
+	if hobo>hippie:
+		return 1
+	else:
+		return 0	
 	
 
 
@@ -172,64 +199,77 @@ def trimDataList(attribute, on_off, data_list): #on =1 off =0
 class Tree:
 	def __init__(self):
 		self.rootNode = None
-		self.currentNode = None	
+		self.currentNode = None
+		self.notInitialized = True
+		self.currDatalist = []
+		self.nodes = [] 
 
-	
-	def construct(data_list):
-		attribute = gainistAttribute(data_list)
-		self.rootNode = Node(attribute)
-		self.buildBranches(data_list, self.rootNode))
-
-	
-	def buildBranches(data_list, node):
-	
-		currentNode = node
-		theS = getS(data_list)	
-
-		#if the current node has 3 ancestors, or the entropy of the datalist is 0, then it is a dead end
-
-		if currentNode.getNumAncestors()==3  or calculateEntropy(theS[0], theS[1]) ==0:
-			#calculate the value of that dead end by which one has the highest count.
-			hobos = 0
-			hippies = 0
-			for datapoint in data_list:
-				if datapoint.hoboOrHippie == 1:
-					hobos = hobos+1
-				else:
-					hippies = hippies +1
-			node = Node()
-			if hobos>hippies:
-				node.setLeaf(True)
-			else:
-				node.setLeaf(False)
-
-			currentNode.addChild(node)	 
-	
+	def construct(self, datalist):
+		if gainiestAttribute(datalist) ==0:
+			node1 = Node()
+			node1.leaf = moreHobosOrHippies(datalist)
+			self.currentNode.addChild(node1)
+			node1.stem = datalist[0].getAttributeValue(self.currentNode.attribute)
 		else:
-			#we split the node, and call build branches on it again. 	
-			new_pos_data_list = trimDataList(currentNode.attribute, True, data_list)	
-			attribute1 = gainiestAttribute(new_pos_data_list)
-			newNode1 = Node(attribute1)		
-			currentNode.addChild(newNode1)
-			buildBranches(new_pos_data_list, newNode1)
+			node2= Node(gainiestAttribute(datalist))
+			if self.rootNode == None:
+				self.rootNode = node2
+			else:
+				self.currentNode.addChild(node2)	
+				node2.stem = datalist[0].getAttributeValue(self.currentNode.attribute)
+			self.currentNode = node2
+				
+			neg_list = trimDataList(gainiestAttribute(datalist), 0, datalist)
+			pos_list = trimDataList(gainiestAttribute(datalist), 1, datalist)
 			
-	
-			new_neg_data_list = trimDataList(currentNode.attribute, False, data_list)
-			attribute0 = gainiestAttribute(new_neg_data_list)	
-			newNode0 = Node(attribute0)
-			currentNode.addChild(newNode0)
-			buildBranches(new_neg_data_list, newNode0)	
+			#because apparently the order of construction matters...
+			if gainiestAttribute(neg_list) ==0 and gainiestAttribute(pos_list)!=0:
+				self.construct(neg_list)
+				self.construct(pos_list)
 
+			elif gainiestAttribute(pos_list) ==0 and gainiestAttribute(neg_list)!=0:
+				self.construct(pos_list)
+				self.construct(neg_list)
+			
+			else:
+				self.construct(neg_list)
+				self.construct(pos_list)
+
+	def predictPoint(self, values):
+		point = Datapoint(values)
+		
+		#start at root node and follow the tree down until you find a leaf. 
+		self.currentNode = self.rootNode
+		pred = None
+
+		while self.currentNode.leaf == None:	
+			target_att = self.currentNode.attribute
+			value = point.getAttributeValue(target_att)
+
+			for child in self.currentNode.children:
+				if child.stem == value:
+					found = True
+					self.currentNode = child
+			if found == False:
+				print "something went wrong"
+			else:
+				pred = self.currentNode.leaf
+		return pred
+			
+	def test(self, datalist):
+		total = len(datalist)
+		count = 0
+		for point in datalist:
+			if int(self.predictPoint(point.asvalues)) == int(point.asvalues[4]):
+				count = count+1
+		accuracy = float(count*100)/total
+		return accuracy
+	
 ##----------------MAIN METHOD ----------------------##
 
 
 # Here have some code that decides how much of the data to use to train the algorithm. 
-
-#1.take all of the features and calculate entropy. While not zero or not all attributes have been noded, calculate gain for every attribute
-#2.pick the one with biggest gain and split the node and call function again. If
-# it is the first time, make it the root node; every subsequent node, add to the previous node; make the previous node the parent, 
-# and any subsequent nodes become the children. 
-#3.base case, set value.  
+  
 
 #FIXME
 
