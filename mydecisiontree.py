@@ -157,7 +157,7 @@ def calculateGain(datapoint_list, attribute):
 def gainiestAttribute(data_list):
 	list_of_gains = []
 	i =0
-	while i<4:
+	while i<5:
 		gain = calculateGain(data_list, i)
 		list_of_gains.append(gain)
 		i = i+1
@@ -232,8 +232,8 @@ class Tree:
 				self.construct(neg_list)
 			
 			else:
-				self.construct(neg_list)
 				self.construct(pos_list)
+				self.construct(neg_list)
 
 	def predictPoint(self, values):
 		point = Datapoint(values)
