@@ -7,7 +7,6 @@
 #														#
 #***************************************************************************************************************#
 
-# A decision tree should be a root node that has a bunch of children attached to it.
 import csv
 import numpy as np
 import sys
@@ -157,7 +156,8 @@ def calculateGain(datapoint_list, attribute):
 def gainiestAttribute(data_list):
 	list_of_gains = []
 	i =0
-	while i<5:
+	amt_of_atts = len(data_list[0].asvalues)
+	while i < amt_of_atts:
 		gain = calculateGain(data_list, i)
 		list_of_gains.append(gain)
 		i = i+1
@@ -204,7 +204,7 @@ class Tree:
 		self.currDatalist = []
 		self.nodes = [] 
 
-	def construct(self, datalist):
+	def construct(self, datalist):		
 		if gainiestAttribute(datalist) ==0:
 			node1 = Node()
 			node1.leaf = moreHobosOrHippies(datalist)
@@ -226,10 +226,6 @@ class Tree:
 			if gainiestAttribute(neg_list) ==0 and gainiestAttribute(pos_list)!=0:
 				self.construct(neg_list)
 				self.construct(pos_list)
-
-			elif gainiestAttribute(pos_list) ==0 and gainiestAttribute(neg_list)!=0:
-				self.construct(pos_list)
-				self.construct(neg_list)
 			
 			else:
 				self.construct(pos_list)
@@ -265,32 +261,6 @@ class Tree:
 		accuracy = float(count*100)/total
 		return accuracy
 	
-##----------------MAIN METHOD ----------------------##
-
-
-# Here have some code that decides how much of the data to use to train the algorithm. 
-  
-
-#FIXME
-
-#data_list = csvToDatapointList("hobohippiedataset.csv")
-#entropy = calculateEntropy(data_list)
-#notFinished = True
-#tree = Tree()
-
-#while notFinished:
-#	gainiestAttribute(data_list)
-	#find the biggest one, make that a node! If no tree, 
-#	node = Node(attributeIndex)
-#	if tree.rootNode = None:
-#		tree.setRootNode(node)
-#	else:
-#		tree.rootNode
-		
-	
-	
-	
-# construct tree from 75% of data default, or customizeable.  
 
 
  
