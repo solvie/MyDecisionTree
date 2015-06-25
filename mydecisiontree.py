@@ -222,7 +222,7 @@ class Tree:
 			neg_list = trimDataList(gainiestAttribute(datalist), 0, datalist)
 			pos_list = trimDataList(gainiestAttribute(datalist), 1, datalist)
 			
-			#because apparently the order of construction matters...
+			# the order of construction matters...
 			if gainiestAttribute(neg_list) ==0 and gainiestAttribute(pos_list)!=0:
 				self.construct(neg_list)
 				self.construct(pos_list)
